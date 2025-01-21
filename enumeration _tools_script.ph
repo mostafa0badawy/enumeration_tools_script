@@ -1,5 +1,10 @@
 !/bin/bash
 
+# Check if the script is run as root (required for some tools)
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root."
+  exit 1
+fi
 
 # Check if an IP address is provided as an argument
 if [ -z "$1" ]; then
@@ -32,6 +37,8 @@ nmap -A "$IP_ADDRESS" -oN "$OUTPUT_DIR/nmap_aggressive_results.txt"
 echo "Running Enum4linux..."
 enum4linux -a "$IP_ADDRESS" > "$OUTPUT_DIR/enum4linux_results.txt"
 
+# Nmap full port scan with service detection
+echo "Running Nmap full port scan (-p- -T4 -sV -Pn -sS)..."
+nmap -p- -T4 -sV -Pn -sS "$IP_ADDRESS" -oN "$OUTPUT_DIR/nmap_full_port_scan_results.txt"
+
 echo "Enumeration completed. Check the $OUTPUT_DIR directory for results."
-
-
